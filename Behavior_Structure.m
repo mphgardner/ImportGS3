@@ -4,8 +4,8 @@ function [Results] = Sat_Unblock_Behavior(Run, cue_window, varargin)
 
 
 %This should be in milliseconds
-pre = -20000;
-post = 30000;
+pre = -40000;
+post = 40000;
 %cue_window = [-30000 0];
 %varargin exists incase on wants to adjust the session numbers to match
 %other runs or stages. For example, in the overexpectation task, the first
@@ -155,7 +155,7 @@ for h = 1:numel(Run)
                     %an in at the beginning if the first event is an out.
                     %Likewise if the last event is an in.
 
-                    poketrain = false(numel(Run(h).Rat(i).Stage(j).Session(k).(Events{j}{l}).(sprintf('S%d_On', p))), post - pre);
+                    poketrain = [];
                     for m = 1:numel(Run(h).Rat(i).Stage(j).Session(k).(Events{j}{l}).(sprintf('S%d_On', p)))
                         
                         %REMOVE
@@ -165,10 +165,10 @@ for h = 1:numel(Run)
                         
                         [poketrain(m,:)] = Check_On_Off(Run(h).Rat(i).Stage(j).Session(k).(Events{j}{l}).(sprintf('S%d_On', p)){m}, Run(h).Rat(i).Stage(j).Session(k).(Events{j}{l}).(sprintf('S%d_Off', p)){m}, pre, post);
                        % errors1 = errors1 + err1;
-                       
-%                         if flag == 1
-%                             display(sprintf('Error occured for rat %d, stage %d, session %d, event %s, on switch %d on trial %d', i,j,k,  Events{j}{l}, p, m))
-%                         end
+                        
+                        if flag == 1
+                            display(sprintf('Error occured for rat %d, stage %d, session %d, event %s, on switch %d on trial %d', i,j,k,  Events{j}{l}, p, m))
+                        end
                         
                         
                     end
@@ -189,7 +189,6 @@ for h = 1:numel(Run)
                     %If the animal is poking at the beginning of the bin,
                     %it can be counted as a poke or not. The first line
                     %below is not counted, the second is counted
-                    
                     %Results.Run(h).Stage(j).Pokes.(sprintf('S%d', p))(i,l,1:trial_num,session_nums(k))= sum(diff(response,1,2) > 0, 2)*(60000/(cue_window(2) - cue_window(1)));
                     
                     Results.Run(h).Stage(j).Pokes.(sprintf('S%d', p))(i,l,1:trial_num,session_nums(k))= sum(diff([false(size(response,1),1) response],1,2) > 0, 2)*(60000/(cue_window(2) - cue_window(1)));
@@ -357,9 +356,10 @@ end
 if (isempty(inpoke) &&  isempty(outpoke))
     return
 end
+
 ins = [inpoke ones(size(inpoke))];
 outs = [outpoke 2*ones(size(outpoke))];
-  
+
 allp = sortrows([ins; outs],1);
 
 %last keeps track of whether the prior time was on off or an on (its

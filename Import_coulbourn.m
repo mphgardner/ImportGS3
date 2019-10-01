@@ -26,8 +26,7 @@ else
 %Source_Folder = 'E:\Sensory Specific Devaluation';
 %Source_Folder = 'E:\OE\OE DIFF RECORDING\tst_files\Run1 TST';
 %Source_Folder = 'E:\Unblocking_October_2016';
-Source_Folder = 'E:\Satiety Revaluation\Run1';
-%Source_Folder = 'E:\Unblocking_June_2017';
+Source_Folder = 'C:\Users\zhouj6\Dropbox (SchoenbaumLab)\Matlab\Coulbourn_backward';
 
 end
 
@@ -133,20 +132,20 @@ for i = 1:numel(Rat_Num)
     
     %This sets the rat's name
     Rat(i).Name = Rat_Num{i};
-    
+
     %The second loop goes through each stage. sheets is the number of
     %stages entered in the design file.
     for j = 1:numel(sheets) - 1
         
         %This if statement exists incase stages are entered on a
         %sheet but not in the main design sheet
-        if numel(Stage) < j
-            continue
-        end    
-        
-        if j == 5
-            a = 1;
-        end    
+%         if numel(Stage) < j
+%             continue
+%         end    
+%         
+%         if j == 8
+%             a = 1;
+%         end    
         %This sets the Stage_Name
         Rat(i).Stage(j).Stage_Name = Stage{j}; %#ok<*AGROW>
         
@@ -253,21 +252,31 @@ for i = 1:numel(Rat_Num)
                             for m = 1:4
                                 %This gets the timestamps for each of the
                                 %switch inputs (on and off) for the current trial_type
+                                if any(strcmp(Rat(i).Name, {'J041' 'J051'})) && m == 3
+                                    
+                                    Rat(i).Stage(j).Session(k).(trial_type{l}).(sprintf('S%d_On', 1)) = ...
+                                    Time_Stamps((TS(k).Response_On(TS(k).Response_On(:,2) == m, 1))*time_unit, (cue_onsets)*time_unit, pre, post);
                                 
+                                    Rat(i).Stage(j).Session(k).(trial_type{l}).(sprintf('S%d_Off', 1)) = ...
+                                    Time_Stamps((TS(k).Response_Off(TS(k).Response_Off(:,2) == m, 1))*time_unit, (cue_onsets)*time_unit, pre, post);
+                                
+                                    Rat(i).Stage(j).Session(k).(trial_type{l}).(sprintf('S%d_On', 3)) = repmat({[]},8,1);
+                                    Rat(i).Stage(j).Session(k).(trial_type{l}).(sprintf('S%d_Off', 3)) = repmat({[]},8,1);
+                                else
+                                    
                                 Rat(i).Stage(j).Session(k).(trial_type{l}).(sprintf('S%d_On', m)) = ...
                                     Time_Stamps((TS(k).Response_On(TS(k).Response_On(:,2) == m, 1))*time_unit, (cue_onsets)*time_unit, pre, post);
                                 
                                 Rat(i).Stage(j).Session(k).(trial_type{l}).(sprintf('S%d_Off', m)) = ...
                                     Time_Stamps((TS(k).Response_Off(TS(k).Response_Off(:,2) == m, 1))*time_unit, (cue_onsets)*time_unit, pre, post);
-                                
+                                end
                             end
                     end
                     %This puts all of the fields in alphanumeric order.
                     %This makes looping through trialtype fields for each stage be in
                     %the same order
-                    if ~isempty(Rat(i).Stage(j).Session)
-                        Rat(i).Stage(j).Session = orderfields(Rat(i).Stage(j).Session);
-                    end
+                    
+                    Rat(i).Stage(j).Session = orderfields(Rat(i).Stage(j).Session);
                 end
     end
 end
@@ -370,17 +379,17 @@ for i = 1:numel(session_start_ind)
     TS(n).State_Off = [TS(n).State_Off; [Behavior_Data{5}(state_onoff_log) Behavior_Data{6}(state_onoff_log)]];
     
     %This loops through the number of possible switches for Coulbourn
-    for j = 1%
+    for j = 1:4
         
         window_log = false(numel(session_starts),1);
         window_log(session_start_ind(i): sess_end) = Behavior_Data{8 + j}(session_start_ind(i): sess_end) == 1;
         
-        TS(n).Response_On = [TS(n).Response_On; [Behavior_Data{5}(window_log) int32(ones(sum(window_log), 1))]];
+        TS(n).Response_On = [TS(n).Response_On; [Behavior_Data{5}(window_log) int32(j*ones(sum(window_log), 1))]];
         
         window_log = false(numel(session_starts),1);
         window_log(session_start_ind(i): sess_end) = Behavior_Data{12 + j}(session_start_ind(i): sess_end) == 1;
         
-        TS(n).Response_Off = [TS(n).Response_Off; [Behavior_Data{5}(window_log) int32(ones(sum(window_log), 1))]];
+        TS(n).Response_Off = [TS(n).Response_Off; [Behavior_Data{5}(window_log) int32(j*ones(sum(window_log), 1))]];
     end
     
     TS(n).Response_On = sortrows(TS(n).Response_On, 1);
@@ -391,10 +400,6 @@ end
 fclose(fileID);
 end
 
-    
-  
-    
-    
-       
+
 
 
