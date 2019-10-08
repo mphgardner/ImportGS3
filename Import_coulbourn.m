@@ -3,7 +3,6 @@ function [Rat] = Import_coulbourn(varargin)
 %numbers. These can be saved as .txt files or called from another script. State_Key must be an excel file in the source folder.
 %The second varargin is the first letters (usually initials) of the data
 %files from coulbourn
-%   Detailed explanation goes here
 
 
 %This should be in milliseconds
